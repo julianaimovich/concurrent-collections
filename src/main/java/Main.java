@@ -46,9 +46,9 @@ public class Main {
             }
         }).start();
 
-        new Thread(() -> getResults(a)).start();
-        new Thread(() -> getResults(b)).start();
-        new Thread(() -> getResults(c)).start();
+        new Thread(() -> getResults(a, firstQueue)).start();
+        new Thread(() -> getResults(b, secondQueue)).start();
+        new Thread(() -> getResults(c, thirdQueue)).start();
     }
 
     public static String generateText(String letters, int length) {
@@ -60,12 +60,12 @@ public class Main {
         return text.toString();
     }
 
-    public static void getResults(char letter) {
+    public static void getResults(char letter, ArrayBlockingQueue<String> queue) {
         List<Integer> letterCount = new ArrayList<>();
 
         for (int i = 0; i < textsCount; i++) {
             try {
-                String text = firstQueue.take();
+                String text = queue.take();
                 int repeatCount = (int) text.chars().filter(ch -> ch == letter).count();
                 letterCount.add(repeatCount);
             } catch (InterruptedException e) {
@@ -73,25 +73,6 @@ public class Main {
             }
         }
 
-        for (int i = 0; i < textsCount; i++) {
-            try {
-                String text = secondQueue.take();
-                int repeatCount = (int) text.chars().filter(ch -> ch == letter).count();
-                letterCount.add(repeatCount);
-            } catch (InterruptedException e) {
-                return;
-            }
-        }
-
-        for (int i = 0; i < textsCount; i++) {
-            try {
-                String text = thirdQueue.take();
-                int repeatCount = (int) text.chars().filter(ch -> ch == letter).count();
-                letterCount.add(repeatCount);
-            } catch (InterruptedException e) {
-                return;
-            }
-        }
         System.out.println("Максимальное количество символов '" + letter + "' в тексте: " + Collections.max(letterCount));
     }
 }
