@@ -13,8 +13,7 @@ public class Main {
     static ArrayBlockingQueue<String> secondQueue = new ArrayBlockingQueue<>(100);
     static ArrayBlockingQueue<String> thirdQueue = new ArrayBlockingQueue<>(100);
 
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         new Thread(() -> {
             for (int i = 0; i < textsCount; i++) {
@@ -46,9 +45,17 @@ public class Main {
             }
         }).start();
 
-        new Thread(() -> getResults(a, firstQueue)).start();
-        new Thread(() -> getResults(b, secondQueue)).start();
-        new Thread(() -> getResults(c, thirdQueue)).start();
+        Thread threadForFirstThread = new Thread(() -> getResults(a, firstQueue));
+        Thread threadForSecondThread = new Thread(() -> getResults(b, secondQueue));
+        Thread threadForThirdThread = new Thread(() -> getResults(c, thirdQueue));
+
+        threadForFirstThread.start();
+        threadForSecondThread.start();
+        threadForThirdThread.start();
+
+        threadForFirstThread.join();
+        threadForSecondThread.join();
+        threadForThirdThread.join();
     }
 
     public static String generateText(String letters, int length) {
